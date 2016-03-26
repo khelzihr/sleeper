@@ -1,4 +1,4 @@
-package se.cqst.sleeper;
+package se.cqst.sleeper.main;
 
 public class MainProgram {
 
@@ -6,6 +6,11 @@ public class MainProgram {
 		
 		switch(args.length)
 		{
+		case 3:
+			
+			break;
+		case 2:
+		case 1:
 		case 0:
 		default:
 			MainProgram.printHelp();
