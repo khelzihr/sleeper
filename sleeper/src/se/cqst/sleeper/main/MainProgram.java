@@ -1,22 +1,64 @@
 package se.cqst.sleeper.main;
 
+import java.util.HashMap;
+
+import se.cqst.sleeper.SleeperTask;
+import se.cqst.sleeper.providers.*;
+
 public class MainProgram {
 
-	public static void main(String[] args) {
-		
-		switch(args.length)
+	public static void main(String[] args) 
+	{
+		HashMap<String, String>	arguments = new HashMap<String, String>();
+		Provider provider = null;
+		MainProgram.initialize(arguments);
+		for(String argument : args)
 		{
-		case 3:
-			
+			String[] splitString = argument.split("=", 2);
+			if(splitString.length > 1)
+				arguments.put(splitString[0], splitString[1]);
+			else
+				arguments.put(splitString[0], "true");
+		}
+		
+		System.out.println(arguments.toString());
+		switch(arguments.get("provider"))
+		{
+		case "guerillamail":
+			if(Boolean.valueOf(arguments.get("verbose")))
+				System.out.println("Provider set to GuerillaMail");
+			provider = new GUMProvider(arguments);
 			break;
-		case 2:
-		case 1:
-		case 0:
+		case "pop3":
+			if(Boolean.valueOf(arguments.get("verbose")))
+				System.out.println("Provider set to POP3");
+			provider = new POP3Provider(arguments);
+			break;
+		case "http":
+			if(Boolean.valueOf(arguments.get("verbose")))
+				System.out.println("Provider set to HTTP");
+			provider = new HTTPProvider(arguments);
+			break;
+		case "console":
+			if(Boolean.valueOf(arguments.get("verbose")))
+				System.out.println("Provider set to Console");
+			provider = new ConsoleProvider(arguments);
+			break;
 		default:
+			if(Boolean.valueOf(arguments.get("verbose")))
+				System.out.println("No provider set, returning help");
 			MainProgram.printHelp();
 			System.exit(0);
 			break;
 		}
+		
+		SleeperTask sleeperTask = SleeperTask.getInstance();
+		sleeperTask.setProvider(provider);
+		sleeperTask.setAction(arguments.get("action"));
+		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
+		sleeperTask.run();
+		
+		
 	}
 	
 	public static void printHelp()
@@ -48,6 +90,19 @@ public class MainProgram {
 		System.out.println("         --provider=guerillamail");
 		System.out.println("Will create a task that listens on a daily generated email address");
 		System.out.println("for a speciifc keyphrase");		
+	}
+	
+	private static void initialize(HashMap<String, String> arguments)
+	{
+		arguments.put("keyphrase", "");
+		arguments.put("action", "");
+		arguments.put("provider", "");
+		arguments.put("notify", "false");
+		arguments.put("pop3server", "");
+		arguments.put("pop3user", "");
+		arguments.put("pop3password", "");
+		arguments.put("httpaddress", "");
+		arguments.put("verbose", "false");
 	}
 
 }
