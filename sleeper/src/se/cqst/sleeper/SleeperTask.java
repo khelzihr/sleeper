@@ -134,7 +134,7 @@ public class SleeperTask  {
 	
 	public void run()
 	{
-		
+		timer.scheduleAtFixedRate(this.getTimerTask(), 0, 10 * 60 * 1000);
 	}
 
 }
