@@ -81,6 +81,7 @@ public class SleeperTask  {
 			{
 				if(SleeperTask.getInstance().getProvider().check())
 				{
+					print(SleeperTask.TASK_EXECUTE);
 					StringBuffer out = new StringBuffer();
 					Process p;
 					
