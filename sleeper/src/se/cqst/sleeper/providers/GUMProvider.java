@@ -88,7 +88,7 @@ public class GUMProvider implements Provider {
 		return object;
 	}
 	
-	private GuerrillaMailObject doSetEmailAddress(GuerrillaMailObject object)
+	private GuerrillaMailObject doSetEmailUser(GuerrillaMailObject object)
 	{
 		URL address = null;
 		
@@ -129,7 +129,7 @@ public class GUMProvider implements Provider {
 
 	private GuerrillaMailObject doInitializeGUM()
 	{
-		return doSetEmailAddress(doGetEmailAddress());
+		return doSetEmailUser(doGetEmailAddress());
 	}
 	
 	private String getMD5EmailAddress()
