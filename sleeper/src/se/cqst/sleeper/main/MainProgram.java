@@ -11,6 +11,13 @@ public class MainProgram {
 	public static void main(String[] args) 
 	{
 		HashMap<String, String>	arguments = MainProgram.getArguments(args);
+		HashMap<String, String> emptyArgs = new HashMap<String, String>();
+		MainProgram.initialize(emptyArgs);
+		if(arguments.equals(emptyArgs))
+		{
+			MainProgram.printHelp();
+			System.exit(0);
+		}
 		Provider provider = MainProgram.getProvider(arguments);
 		
 		if(Boolean.valueOf(arguments.get("debug")))
@@ -20,6 +27,8 @@ public class MainProgram {
 		sleeperTask.setProvider(provider);
 		sleeperTask.setAction(arguments.get("action"));
 		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
+		
+
 		sleeperTask.run();
 		
 		
@@ -28,6 +37,7 @@ public class MainProgram {
 	public static void printHelp()
 	{
 		//TODO: Rewrite help
+		System.out.println("Sleeper - TODO: Write help section");
 	}
 	
 	private static HashMap<String, String> getArguments(String[] args)
