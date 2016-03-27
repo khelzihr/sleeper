@@ -1,6 +1,8 @@
 package se.cqst.sleeper.providers;
 
 import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,6 +32,29 @@ public class GUMProvider implements Provider {
 			System.out.println(NOTIFY_INFO2);
 			System.exit(0);
 		}
+	}
+	
+	@Override
+	public boolean check()
+	{
+		String apiurl = "http://api.guerrillamail.com/ajax.php";
+		String ipAddress = "192.168.0.2";
+		try
+		{
+			 ipAddress = InetAddress.getLocalHost().toString();
+		}
+		catch (UnknownHostException e) {}
+		
+		
+		
+		
+		
+		return false;
+	}
+	
+	private void checkEmailAddress(HashMap<String, String> arguments)
+	{
+		
 	}
 	
 	private String getEmailAddress()
