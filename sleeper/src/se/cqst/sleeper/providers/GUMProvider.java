@@ -8,13 +8,28 @@ import java.util.HashMap;
 
 public class GUMProvider implements Provider {
 	
+	public static final String NOTIFY_INFO = 
+			"To trigger a sleeper client using keyprase \"%s\", send an e-mail containing the keyword anywhere in the message " +
+			"body to the following address.";
+	
+	public static final String NOTIFY_INFO2 = "The address changes every day, so run this application again with the " +
+			"notify argument to get the current address.";
+	
 	HashMap<String, String>	arguments;
 	
 	public GUMProvider(HashMap<String, String> arguments)
 	{
 		this.arguments = arguments;
-		System.out.println(getMd5("Test"));
-		System.out.println(getEmailAddress());
+		
+		if(Boolean.valueOf(arguments.get("notify")))
+		{
+			System.out.println(String.format(NOTIFY_INFO, arguments.get("keyphrase")));
+			System.out.println();
+			System.out.println(this.getEmailAddress());
+			System.out.println();
+			System.out.println(NOTIFY_INFO2);
+			System.exit(0);
+		}
 	}
 	
 	private String getEmailAddress()
@@ -45,6 +60,18 @@ public class GUMProvider implements Provider {
 		}
 		
 		return hashtext;
+	}
+	
+	private String getDate()
+	{
+		Calendar cal = Calendar.getInstance();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		return sdf.format(cal.getTime());
+	}
+	
+	private void print(String text)
+	{
+		System.out.println("[" + getDate() + "] " + text);
 	}
 
 }
