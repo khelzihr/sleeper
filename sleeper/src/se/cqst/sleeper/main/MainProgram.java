@@ -1,5 +1,6 @@
 package se.cqst.sleeper.main;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 
 import se.cqst.sleeper.SleeperTask;
@@ -21,36 +22,41 @@ public class MainProgram {
 				arguments.put(splitString[0], "true");
 		}
 		
-		System.out.println(arguments.toString());
-		switch(arguments.get("provider"))
+		try
 		{
-		case "guerillamail":
-			if(Boolean.valueOf(arguments.get("verbose")))
-				System.out.println("Provider set to GuerillaMail");
-			provider = new GUMProvider(arguments);
-			break;
-		case "pop3":
-			if(Boolean.valueOf(arguments.get("verbose")))
-				System.out.println("Provider set to POP3");
-			provider = new POP3Provider(arguments);
-			break;
-		case "http":
-			if(Boolean.valueOf(arguments.get("verbose")))
-				System.out.println("Provider set to HTTP");
-			provider = new HTTPProvider(arguments);
-			break;
-		case "console":
-			if(Boolean.valueOf(arguments.get("verbose")))
-				System.out.println("Provider set to Console");
-			provider = new ConsoleProvider(arguments);
-			break;
-		default:
-			if(Boolean.valueOf(arguments.get("verbose")))
-				System.out.println("No provider set, returning help");
-			MainProgram.printHelp();
-			System.exit(0);
-			break;
+			Object instance = null;
+			Class<?>	clazz = Class.forName(arguments.get("provider"));
+			Constructor<?> constructor = clazz.getConstructor(HashMap.class);
+			instance = constructor.newInstance(arguments);
+			if(instance instanceof se.cqst.sleeper.providers.Provider)
+				provider = (Provider)instance;
+			else
+			{
+				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers");
+				System.exit(0);
+			}
 		}
+		catch(ClassNotFoundException ex)
+		{
+			System.out.println("The provider \"" + arguments.get("provider") + 
+					"\" does not exist. Make sure you enter the full name of the class.");
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		catch(NoSuchMethodException ex)
+		{
+			System.out.println("The provider \"" + arguments.get("provider") + 
+					"\" does not have a valid constructor (valid types are Provider(HashMap<String, String>))");
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		
+		System.out.println(arguments.toString());
 		
 		SleeperTask sleeperTask = SleeperTask.getInstance();
 		sleeperTask.setProvider(provider);
@@ -63,33 +69,7 @@ public class MainProgram {
 	
 	public static void printHelp()
 	{
-		System.out.println();
-		System.out.println("sleeper.jar [--keyphrase=phrase] [--action=action] [--provider=provider]");
-		System.out.println("            [provider options...]");
-		System.out.println();
-		System.out.println("Options: ");
-		System.out.println("     --keyphrase=phrase   - keyphrase used to execute command");
-		System.out.println("     --action=action      - action performed on execution");
-		System.out.println("     --provider=provider  - provider sleeper will use to listen");
-		System.out.println();
-		System.out.println("Provider options: ");
-		System.out.println();
-		System.out.println("     --provider=guerillamail - Uses GuerillaMail as provider");
-		System.out.println("                               An address will be generated every day.");
-		System.out.println("     --notify                  Displays current GuerillaMail email address");
-		System.out.println("                               for the given keyphrase");
-		System.out.println("     --provider=pop3         - Uses POP3 as provider");
-		System.out.println("     --pop3server=server     - POP3 server address");
-		System.out.println("     --pop3user=user         - POP3 user name");
-		System.out.println("     --pop3password=password - POP3 user password");
-		System.out.println("     --provider=http         - Uses HTTP/HTTPS as provider");
-		System.out.println("     --httpaddress=address   - Address of web page");
-		System.out.println("     --provider=console      - Uses the console as provider");
-		System.out.println();
-		System.out.println("Example: sleeper --keyphrase=\"Test\" --action=\"ping 127.0.0.1\"");
-		System.out.println("         --provider=guerillamail");
-		System.out.println("Will create a task that listens on a daily generated email address");
-		System.out.println("for a speciifc keyphrase");		
+		//TODO: Rewrite help
 	}
 	
 	private static void initialize(HashMap<String, String> arguments)
