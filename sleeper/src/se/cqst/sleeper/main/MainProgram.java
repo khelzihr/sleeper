@@ -10,8 +10,29 @@ public class MainProgram {
 
 	public static void main(String[] args) 
 	{
+		HashMap<String, String>	arguments = MainProgram.getArguments(args);
+		Provider provider = MainProgram.getProvider(arguments);
+		
+		if(Boolean.valueOf(arguments.get("debug")))
+			System.out.println(arguments.toString());
+		
+		SleeperTask sleeperTask = SleeperTask.getInstance();
+		sleeperTask.setProvider(provider);
+		sleeperTask.setAction(arguments.get("action"));
+		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
+		sleeperTask.run();
+		
+		
+	}
+	
+	public static void printHelp()
+	{
+		//TODO: Rewrite help
+	}
+	
+	private static HashMap<String, String> getArguments(String[] args)
+	{
 		HashMap<String, String>	arguments = new HashMap<String, String>();
-		Provider provider = null;
 		MainProgram.initialize(arguments);
 		for(String argument : args)
 		{
@@ -21,6 +42,12 @@ public class MainProgram {
 			else
 				arguments.put(splitString[0], "true");
 		}
+		return arguments;
+	}
+	
+	private static Provider getProvider(HashMap<String, String> arguments)
+	{
+		Provider provider = null;
 		
 		try
 		{
@@ -32,7 +59,7 @@ public class MainProgram {
 				provider = (Provider)instance;
 			else
 			{
-				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers");
+				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers.Provider");
 				System.exit(0);
 			}
 		}
@@ -55,21 +82,7 @@ public class MainProgram {
 			ex.printStackTrace();
 			System.exit(0);
 		}
-		
-		System.out.println(arguments.toString());
-		
-		SleeperTask sleeperTask = SleeperTask.getInstance();
-		sleeperTask.setProvider(provider);
-		sleeperTask.setAction(arguments.get("action"));
-		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
-		sleeperTask.run();
-		
-		
-	}
-	
-	public static void printHelp()
-	{
-		//TODO: Rewrite help
+		return provider;
 	}
 	
 	private static void initialize(HashMap<String, String> arguments)
@@ -83,6 +96,7 @@ public class MainProgram {
 		arguments.put("pop3password", "");
 		arguments.put("httpaddress", "");
 		arguments.put("verbose", "false");
+		arguments.put("debug", "false");
 	}
 
 }
