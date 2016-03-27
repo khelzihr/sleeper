@@ -76,7 +76,7 @@ public class MainProgram {
 	{
 		arguments.put("keyphrase", "");
 		arguments.put("action", "");
-		arguments.put("provider", "");
+		arguments.put("provider", "se.cqst.sleeper.providers.NoProvider");
 		arguments.put("notify", "false");
 		arguments.put("pop3server", "");
 		arguments.put("pop3user", "");
