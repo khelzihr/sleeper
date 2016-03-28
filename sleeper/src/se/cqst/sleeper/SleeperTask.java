@@ -22,6 +22,8 @@ public class SleeperTask  {
 	private Provider 	provider;
 	private String		action;
 	
+	private int			repeat;
+	
 	private Timer timer;
 	
 	private boolean verbose;
@@ -33,6 +35,7 @@ public class SleeperTask  {
 		provider = null;
 		action = "";
 		verbose = false;
+		setRepeat(5);
 	}
 	
 	public static SleeperTask getInstance()
@@ -70,6 +73,17 @@ public class SleeperTask  {
 	public void setVerbose(boolean verbose)
 	{
 		this.verbose = verbose;
+	}
+	
+	public int getRepeat() {
+		return repeat;
+	}
+
+	public void setRepeat(int repeat) {
+		if (repeat >= 3)
+			this.repeat = repeat;
+		if(verbose)
+			print("Repeat set to: " + repeat + " min (min value allowed is 3 min)");
 	}
 	
 	private TimerTask getTimerTask()
@@ -140,7 +154,7 @@ public class SleeperTask  {
 	
 	public void run()
 	{
-		timer.scheduleAtFixedRate(this.getTimerTask(), 0, 10 * 60 * 1000);
+		timer.scheduleAtFixedRate(this.getTimerTask(), 0, repeat * 60 * 1000);
 	}
 
 }
