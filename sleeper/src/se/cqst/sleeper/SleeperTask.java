@@ -97,6 +97,11 @@ public class SleeperTask  {
 							out.append(line + '\n');
 						}
 					}
+					catch(IllegalArgumentException ex)
+					{
+						print("No argument to execute was specified. Program will now terminate.");
+						System.exit(0);
+					}
 					catch(Exception ex)
 					{
 						ex.printStackTrace();
