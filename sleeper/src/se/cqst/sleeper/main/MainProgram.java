@@ -28,7 +28,7 @@ public class MainProgram {
 		int repeat = 5;
 		try
 		{
-			repeat = Integer.parseInt("repeat");
+			repeat = Integer.parseInt(arguments.get("repeat"));
 		}
 		catch(NumberFormatException ex)
 		{ }
