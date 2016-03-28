@@ -24,10 +24,19 @@ public class MainProgram {
 			System.out.println(arguments.toString());
 		
 		SleeperTask sleeperTask = SleeperTask.getInstance();
-		sleeperTask.setProvider(provider);
-		sleeperTask.setAction(arguments.get("action"));
+		
+		int repeat = 5;
+		try
+		{
+			repeat = Integer.parseInt("repeat");
+		}
+		catch(NumberFormatException ex)
+		{ }
 		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
 		
+		sleeperTask.setRepeat(repeat);
+		sleeperTask.setProvider(provider);
+		sleeperTask.setAction(arguments.get("action"));
 
 		sleeperTask.run();
 		
@@ -108,6 +117,7 @@ public class MainProgram {
 		arguments.put("verbose", "false");
 		arguments.put("debug", "false");
 		arguments.put("parser", "se.cqst.sleeper.parsers.PlainTextParser");
+		arguments.put("repeat", "5");
 	}
 
 }
