@@ -11,6 +11,8 @@ import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectReader;
 public class GUMProvider implements Provider {
 	
 	public static final String API_URL = "http://api.guerrillamail.com/ajax.php";
+	public static final String USER_AGENT = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11";
 	
 	// public static final String GUERRILLA_DOMAIN = "grr.la";
 	
@@ -30,6 +33,7 @@ public class GUMProvider implements Provider {
 			"notify argument to get the current address.";
 	
 	private HashMap<String, String>	arguments;
+	private String lastEmailAddress;
 	
 	private ObjectMapper mapper;
 	
@@ -37,6 +41,7 @@ public class GUMProvider implements Provider {
 	{
 		this.arguments = arguments;
 		this.mapper = new ObjectMapper();
+		this.lastEmailAddress = "";
 		
 		if(Boolean.valueOf(arguments.get("notify")))
 		{
@@ -52,82 +57,152 @@ public class GUMProvider implements Provider {
 	@Override
 	public boolean check()
 	{
-		System.out.println(doInitializeGUM());
+		System.out.println(doFetchEmails(doGetEmailList(doInitializeGUM())));
+		System.exit(0);
 		return false;
+		
 	}
 	
-	private GuerrillaMailObject doGetEmailAddress()
+	private GuerrillaMailboxObject doGetEmailAddress()
 	{
-		URL address = null;
-		String ipAddress = this.getLocalIPAddress();
-		GUMProvider.GuerrillaMailObject object = null;
-
-		try 
+		return this.queryGuerrillaMail("?f=get_email_address", null, null, false);
+	}
+	
+	private GuerrillaMailboxObject doSetEmailUser(GuerrillaMailboxObject object)
+	{
+		object = this.queryGuerrillaMail("?f=set_email_user", null, object, true);
+		if(!object.getEmail_addr().equals(this.lastEmailAddress))
 		{
-			address = new URL(API_URL + "?f=get_email_address&ip=" + ipAddress + "&agent=sltest");
-		} 
-		catch (MalformedURLException e) 
-		{
-			e.printStackTrace();
-			System.exit(0);
-		}
-
-		URLConnection connection;
-		try 
-		{
-			connection = address.openConnection();
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
-			connection.connect();
-			object = mapper.readValue(connection.getInputStream(), GUMProvider.GuerrillaMailObject.class);
-		} 
-		catch (IOException e)
-		{
-			e.printStackTrace();
-			System.exit(0);
+			print("GUMProvider now listening on: ");
+			print(object.getEmail_addr());
+			this.lastEmailAddress = object.getEmail_addr();
 		}
 		return object;
 	}
 	
-	private GuerrillaMailObject doSetEmailUser(GuerrillaMailObject object)
+	private GuerrillaMailboxObject doGetEmailList(GuerrillaMailboxObject object)
+	{
+		return this.queryGuerrillaMail("?f=get_email_list", null, object, true);
+	}
+	
+	private GuerrillaMailboxObject doFetchEmails(GuerrillaMailboxObject object)
+	{
+		if(object.getList() != null)
+		{
+			for(GuerrillaMailboxObject.GuerrillaMailObject mail : object.getList())
+			{
+				int mailId = 0;
+				try
+				{
+					mailId = Integer.parseInt(mail.getMail_id());
+				}
+				catch(NumberFormatException ex)
+				{
+					
+				}
+				if(mailId > 1)
+				{
+					URL address = null;
+					try
+					{
+						address = new URL(API_URL + "?f=fetch_email&sid_token=" + object.getSid_token() + "&email_id=" + mail.getMail_id());
+						System.out.println(address.toString());
+					}
+					catch(Exception ex)
+					{
+						ex.printStackTrace();
+						System.exit(0);
+					}
+					URLConnection connection = null;
+					try
+					{
+						connection = address.openConnection();
+						connection.setRequestProperty("User-Agent", USER_AGENT);
+						connection.connect();
+						ObjectReader objr = mapper.readerForUpdating(mail);
+						objr.readValue(connection.getInputStream());
+						connection.getInputStream().close();
+					}
+					catch (Exception ex)
+					{
+						System.out.println("Could not read mail_id: " + mail.getMail_id());
+					}
+				}
+			}
+		}
+		
+		return object;
+	}
+	
+	private GuerrillaMailboxObject queryGuerrillaMail(String function, String parameters, GuerrillaMailboxObject object, boolean doUpdate)
 	{
 		URL address = null;
 		
+		if(parameters == null || parameters.equals(""))
+		{
+			switch(function)
+			{
+			case "?f=get_email_address":
+				parameters = "&ip=" + this.getLocalIPAddress() + "&agent=sltest";
+				break;
+			case "?f=set_email_user":
+				if(object != null && doUpdate)
+					parameters = "&email_user=" + getMD5EmailAddress() + "&sid_token=" + object.getSid_token();
+				else
+					parameters = "";
+				break;
+			case "?f=get_email_list":
+				if(object != null && doUpdate)
+					parameters = "&sid_token=" + object.getSid_token() + "&offset=0";
+				else
+					parameters = "";
+				break;
+			default:
+				parameters = "";
+				function = "";
+				break;
+			}
+		}
+		
 		try 
 		{
-			address = new URL(API_URL + "?f=set_email_user" + "&email_user=" + getMD5EmailAddress() + 
-					"&sid_token=" + object.getSid_token());
+			address = new URL(API_URL + function + parameters);
 		} 
 		catch (MalformedURLException e) 
 		{
 			e.printStackTrace();
 			System.exit(0);
 		}
-
+		
 		URLConnection connection;
 		try 
 		{
 			connection = address.openConnection();
-			connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.95 Safari/537.11");
+			connection.setRequestProperty("User-Agent", USER_AGENT);
 			connection.connect();
-			/*
-			Scanner sc = new Scanner(connection.getInputStream());
-			sc.useDelimiter("\\A");
-			System.out.println(sc.next());
-			sc.close();
-			*/
-			ObjectReader objr = mapper.readerForUpdating(object);
-			objr.readValue(connection.getInputStream());
+			if(doUpdate)
+			{
+				ObjectReader objr = mapper.readerForUpdating(object);
+				objr.readValue(connection.getInputStream());
+			}
+			else
+			{
+				object = mapper.readValue(connection.getInputStream(), GUMProvider.GuerrillaMailboxObject.class);
+			}
+			connection.getInputStream().close();
 		} 
 		catch (IOException e)
 		{
 			e.printStackTrace();
 			System.exit(0);
-		}
+		}	
+		
+		
 		return object;
 	}
 	
 
-	private GuerrillaMailObject doInitializeGUM()
+	private GuerrillaMailboxObject doInitializeGUM()
 	{
 		return doSetEmailUser(doGetEmailAddress());
 	}
@@ -193,7 +268,7 @@ public class GUMProvider implements Provider {
 	}
 	
 	@JsonIgnoreProperties(ignoreUnknown = true)
-	public static class GuerrillaMailObject
+	public static class GuerrillaMailboxObject
 	{
 		private String email_addr;
 		private String lang;
@@ -204,8 +279,10 @@ public class GUMProvider implements Provider {
 		private String alias_error;
 		private String site_id;
 		private String site;
+		private Integer count;
+		private List<GuerrillaMailObject> list;
 		
-		public GuerrillaMailObject()
+		public GuerrillaMailboxObject()
 		{
 			this.email_addr = "";
 			this.lang = "";
@@ -218,10 +295,12 @@ public class GUMProvider implements Provider {
 		{
 			return  " alias: " + alias +
 					"\r\n alias_error: " + alias_error + 
+					"\r\n count: " + count +
 					"\r\n domain: " + domain +
 					"\r\n email_addr: " + email_addr + 
 					"\r\n email_timestamp: " + email_timestamp +
 					"\r\n lang: " + lang + 
+					"\r\n list: " + ((list != null) ? list.toString() : "") +
 					"\r\n sid_token: " + sid_token +
 					"\r\n site: " + site +
 					"\r\n site_id: " + getSite_id();
@@ -298,9 +377,124 @@ public class GUMProvider implements Provider {
 			this.site = site;
 		}		
 
+		public Integer getCount() {
+			return count;
+		}
+
+		public void setCount(Integer count) {
+			this.count = count;
+		}
+
+		public List<GuerrillaMailObject> getList() {
+			return list;
+		}
+
+		public void setList(List<GuerrillaMailObject> list) {
+			this.list = list;
+		}
+
+		@JsonIgnoreProperties(ignoreUnknown = true)
+		public static class GuerrillaMailObject
+		{
+			
+			private String mail_id;
+			private String mail_from;
+			private String mail_recipient;
+			private String mail_subject;
+			private String mail_excerpt;
+			private String mail_body;
+			private String mail_timestamp;
+			private String mail_date;
+			private Integer mail_read;
+			private String content_type;
+			private String sid_token;
+			
+			@Override
+			public String toString()
+			{
+				return " mail_id: " + mail_id +
+						"\r\n mail_from: " + mail_from + 
+						"\r\n mail_recipient: " + mail_recipient + 
+						"\r\n mail_subject: " + mail_subject +
+						"\r\n mail_excerpt: " + mail_excerpt +
+						"\r\n mail_body: " + mail_body +
+						"\r\n mail_timestamp: " + mail_timestamp +
+						"\r\n mail_date: " + mail_date +
+						"\r\n mail_read: " + mail_read + 
+						"\r\n content_type: " + content_type +
+						"\r\n sid_token: " + sid_token;
+			}
 		
+			public String getMail_id() {
+				return mail_id;
+			}
+			public void setMail_id(String mail_id) {
+				this.mail_id = mail_id;
+			}
+			public String getMail_from() {
+				return mail_from;
+			}
+			public void setMail_from(String mail_from) {
+				this.mail_from = mail_from;
+			}
+			public String getMail_recipient() {
+				return mail_recipient;
+			}
+			public void setMail_recipient(String mail_recipient) {
+				this.mail_recipient = mail_recipient;
+			}
+			public String getMail_subject() {
+				return mail_subject;
+			}
+			public void setMail_subject(String mail_subject) {
+				this.mail_subject = mail_subject;
+			}
+			public String getMail_excerpt() {
+				return mail_excerpt;
+			}
+			public void setMail_excerpt(String mail_excerpt) {
+				this.mail_excerpt = mail_excerpt;
+			}
+			public String getMail_body() {
+				return mail_body;
+			}
+			public void setMail_body(String mail_body) {
+				this.mail_body = mail_body;
+			}
+			public String getMail_timestamp() {
+				return mail_timestamp;
+			}
+			public void setMail_timestamp(String mail_timestamp) {
+				this.mail_timestamp = mail_timestamp;
+			}
+			public String getMail_date() {
+				return mail_date;
+			}
+			public void setMail_date(String mail_date) {
+				this.mail_date = mail_date;
+			}
+			public Integer getMail_read() {
+				return mail_read;
+			}
+			public void setMail_read(Integer mail_read) {
+				this.mail_read = mail_read;
+			}
+			public String getContent_type() {
+				return content_type;
+			}
+			public void setContent_type(String content_type) {
+				this.content_type = content_type;
+			}
+			public String getSid_token() {
+				return sid_token;
+			}
+			public void setSid_token(String sid_token) {
+				this.sid_token = sid_token;
+			}
+
+		}
 		
 		
 	}
-
+	
 }
