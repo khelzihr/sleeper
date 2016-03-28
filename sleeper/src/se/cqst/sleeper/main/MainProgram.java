@@ -107,6 +107,7 @@ public class MainProgram {
 		arguments.put("httpaddress", "");
 		arguments.put("verbose", "false");
 		arguments.put("debug", "false");
+		arguments.put("parser", "se.cqst.sleeper.parsers.PlainTextParser");
 	}
 
 }
