@@ -1,6 +1,7 @@
 package se.cqst.sleeper.providers;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -12,11 +13,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
+
+import se.cqst.sleeper.parsers.Parser;
 
 public class GUMProvider implements Provider {
 	
@@ -57,10 +59,83 @@ public class GUMProvider implements Provider {
 	@Override
 	public boolean check()
 	{
-		System.out.println(doFetchEmails(doGetEmailList(doInitializeGUM())));
-		System.exit(0);
-		return false;
+		GuerrillaMailboxObject object = this.doInitializeGUM();
+		object = this.doFetchEmails(this.doGetEmailList(object));
+		return this.parseEmails(object);
+	}
+	
+	private boolean parseEmails(GuerrillaMailboxObject object)
+	{
+		Parser parser = this.getParser(arguments);
+		if(object == null || object.getList() == null || object.getList().isEmpty())
+			return false;
+		else
+		{
+			for(GuerrillaMailboxObject.GuerrillaMailObject mail : object.getList())
+			{
+				int mailId = 0;
+				try
+				{
+					mailId = Integer.parseInt(mail.getMail_id());
+				}
+				catch(NumberFormatException ex)
+				{
+					
+				}
+				if(mailId != 1)
+				{
+					if(Boolean.valueOf(arguments.get("debug")))
+						print("Debug: Parsing mail: " + mail.getMail_id());
+					if(parser.phraseExists(arguments.get("keyphrase"), mail.getMail_body()))
+						return true;
+				}
+			}
+		}
 		
+		if(Boolean.valueOf(arguments.get("verbose")))
+			print("Verbose: Keyphrase was not found");
+		
+		return false;
+	}
+	
+	private Parser getParser(HashMap<String, String> arguments)
+	{
+		Parser parser = null;
+		
+		try
+		{
+			Object instance = null;
+			Class<?>	clazz = Class.forName(arguments.get("parser"));
+			Constructor<?> constructor = clazz.getConstructor(HashMap.class);
+			instance = constructor.newInstance(arguments);
+			if(instance instanceof se.cqst.sleeper.parsers.Parser)
+				parser = (Parser)instance;
+			else
+			{
+				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers.Provider");
+				System.exit(0);
+			}
+		}
+		catch(ClassNotFoundException ex)
+		{
+			System.out.println("The parser \"" + arguments.get("parser") + 
+					"\" does not exist. Make sure you enter the full name of the class.");
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		catch(NoSuchMethodException ex)
+		{
+			System.out.println("The parser \"" + arguments.get("parser") + 
+					"\" does not have a valid constructor (valid types are Parser(HashMap<String, String>))");
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			System.exit(0);
+		}
+		return parser;
 	}
 	
 	private GuerrillaMailboxObject doGetEmailAddress()
@@ -106,7 +181,6 @@ public class GUMProvider implements Provider {
 					try
 					{
 						address = new URL(API_URL + "?f=fetch_email&sid_token=" + object.getSid_token() + "&email_id=" + mail.getMail_id());
-						System.out.println(address.toString());
 					}
 					catch(Exception ex)
 					{
@@ -244,7 +318,6 @@ public class GUMProvider implements Provider {
 		return sdf.format(cal.getTime());
 	}
 	
-	@SuppressWarnings("unused")
 	private void print(String text)
 	{
 		System.out.println("[" + getDate() + "] " + text);
