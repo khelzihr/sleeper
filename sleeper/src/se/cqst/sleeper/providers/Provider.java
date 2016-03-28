@@ -5,13 +5,37 @@ import java.util.HashMap;
 
 import se.cqst.sleeper.parsers.Parser;
 
+/**
+ * The Provider interface provides the application with the tools needed to check if
+ * the key phrase has been sent. 
+ * 
+ * Providers uses the check() method to determine if the
+ * key phrase has been found, and may use getParser() to parse incoming text to find
+ * the phrase.
+ */
 public interface Provider {
 	
+	/**
+	 * Check if the key phrase has been provided.
+	 *
+	 * @return true, if successful
+	 */
 	default boolean check()
 	{
 		return false;
 	}
 	
+	/**
+	 * <p>Use reflection to dynamically instantiate a Parser class based on the arguments
+	 * provided.</p>
+	 * 
+	 * <p>The full name of the class must be provided in the key "parser", ex:
+	 * <br />
+	 * <code>arguments.set("parser", "se.cqst.sleeper.parsers.PlainTextParser");</code></p>
+	 *
+	 * @param arguments a HashMap<String, String> with arguments for the Parser
+	 * @return the parser
+	 */
 	default Parser getParser(HashMap<String, String> arguments)
 	{
 		Parser parser = null;
@@ -26,7 +50,7 @@ public interface Provider {
 				parser = (Parser)instance;
 			else
 			{
-				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers.Provider");
+				System.out.println("Provider must be an implementation of se.cqst.sleeper.providers.Parser");
 				System.exit(0);
 			}
 		}
