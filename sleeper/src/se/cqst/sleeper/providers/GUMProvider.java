@@ -421,28 +421,6 @@ public class GUMProvider implements Provider {
 	}
 	
 	/**
-	 * <p>Returns the current date</p>
-	 *
-	 * @return Current date in yyyy-MM-dd HH:mm format
-	 */
-	private String getDate()
-	{
-		Calendar cal = Calendar.getInstance();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		return sdf.format(cal.getTime());
-	}
-	
-	/**
-	 * <p>Prints text to <code>System.out</code> with a prefix date in brackets.</p>
-	 *
-	 * @param text text to be printed
-	 */
-	private void print(String text)
-	{
-		System.out.println("[" + getDate() + "] " + text);
-	}
-	
-	/**
 	 * <p>Returns the local IP-address; if multiple addresses, one will be chosen.</p>
 	 *
 	 * @return the local ip address
