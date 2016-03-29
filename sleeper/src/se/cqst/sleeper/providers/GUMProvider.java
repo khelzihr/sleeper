@@ -51,6 +51,8 @@ import se.cqst.sleeper.parsers.Parser;
  * 	</table>
  * </code>
  * 
+ * @author Nicklas Rosvall Carlquist
+ * 
  * @see <a href="https://www.guerrillamail.com/GuerrillaMailAPI.html">GuerrillaMail API</a> for more information about the API
  */
 public class GUMProvider implements Provider {
@@ -76,6 +78,8 @@ public class GUMProvider implements Provider {
 	 * 
 	 * @param arguments a HashMap with arguments
 	 * 
+	 * @author Nicklas Rosvall Carlquist
+	 * 
 	 * @see {@link Provider} for general information about the Provider interface
 	 * @see {@link GUMProvider} for a list of arguments used by GUMProvider
 	 */
@@ -99,6 +103,10 @@ public class GUMProvider implements Provider {
 	
 	/* (non-Javadoc)
 	 * @see se.cqst.sleeper.providers.Provider#check()
+	 * 
+	 * The check() method in GUMProvider initializes a 
+	 * GuerrillaMailboxObject, fetches emails and calls
+	 * on parseEmails() to determine if the key phrase is found
 	 */
 	@Override
 	public boolean check()
@@ -122,6 +130,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @param object the GuerrillaMailboxObject
 	 * @return true, if key phrase is found by the Parser
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 * 
 	 * @see {@link Parser} for more information about Parsers
 	 */
@@ -167,6 +177,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @return A new GuerrillaMailboxObject with a default e-mail address
 	 * 
+	 * @author Nicklas Rosvall Carlquist
+	 * 
 	 * @see {@link #queryGuerrillaMail(String, String, GuerrillaMailboxObject, boolean)} for more information about the API
 	 * @see {@link GuerrillaMailboxObject} for information about the object
 	 */
@@ -184,6 +196,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @param object the object
 	 * @return the input object with a specified e-mail address
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private GuerrillaMailboxObject doSetEmailUser(GuerrillaMailboxObject object)
 	{
@@ -209,6 +223,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @param object A GuerrillaMailboxObject with a valid <code>sid_token</code>
 	 * @return The input object updated with a list of e-mails.
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private GuerrillaMailboxObject doGetEmailList(GuerrillaMailboxObject object)
 	{
@@ -223,6 +239,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @param object The input GuerrillaMailboxObject with a list of messages
 	 * @return The input object with added message bodies
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private GuerrillaMailboxObject doFetchEmails(GuerrillaMailboxObject object)
 	{
@@ -293,6 +311,8 @@ public class GUMProvider implements Provider {
 	 * @param object A <code>GuerrillaMailboxObject</code>, or <code>null</code> if no input object is required.
 	 * @param doUpdate <code>true</code> if you are updating an existing <code>GuerrillaMailboxObject</code>. <code>false</code> otherwise.
 	 * @return A <code>GuerrillaMailboxObject</code> containing the returned JSON data.
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 * 
 	 * @see {@link GUMProvider} for more information about the GuerrillaMail API and links to further resources.
 	 */
@@ -369,6 +389,8 @@ public class GUMProvider implements Provider {
 	 * and set a valid e-mail address</p>
 	 *
 	 * @return A <code>GuerrillaMailboxObject</code> with a valid <code>sid_token</code> and a valid e-mail address
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private GuerrillaMailboxObject doInitializeGUM()
 	{
@@ -384,6 +406,8 @@ public class GUMProvider implements Provider {
 	 * </ul></li></code></p>
 	 *
 	 * @return A MD5 hashed String
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private String getMd5EmailAddress()
 	{		
@@ -398,6 +422,8 @@ public class GUMProvider implements Provider {
 	 *
 	 * @param input input String
 	 * @return MD5 hash of the String
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private String getMd5(String input)
 	{
@@ -425,6 +451,8 @@ public class GUMProvider implements Provider {
 	 * <p>Returns the local IP-address; if multiple addresses, one will be chosen.</p>
 	 *
 	 * @return the local ip address
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	private String getLocalIPAddress()
 	{
@@ -453,6 +481,8 @@ public class GUMProvider implements Provider {
 	 * 
 	 * <p>With <code>JsonIgnoreProperties(ignoreUnknown = true)</code>, jackson should still be able to process JSON data
 	 * from GuerrillaMail into <code>GuerrillaMailboxObjects</code> if another JSON field is added to the API.</p>
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 *  
 	 */
 	@JsonIgnoreProperties(ignoreUnknown = true)
@@ -476,6 +506,8 @@ public class GUMProvider implements Provider {
 		 * 
 		 * <p>All data is filled using the setter methods, so this constructor does
 		 * nothing.</p>
+		 * 
+		 * @author Nicklas Rosvall Carlquist
 		 */
 		public GuerrillaMailboxObject()
 		{
@@ -529,6 +561,8 @@ public class GUMProvider implements Provider {
 		 * 
 		 * <p>This class is used by <code>com.fasterxml.jackson</code> to translate
 		 * JSON objects into Java class instances.</p>
+		 * 
+		 * @author Nicklas Rosvall Carlquist
 		 * 
 		 * @see {@link GUMProvider.GuerrillaMailboxObject} for information about classes used by <code>jackson</code>
 		 */

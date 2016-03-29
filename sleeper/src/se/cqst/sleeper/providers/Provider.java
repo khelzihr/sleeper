@@ -14,6 +14,8 @@ import se.cqst.sleeper.parsers.Parser;
  * Providers uses the check() method to determine if the
  * key phrase has been found, and may use getParser() to parse incoming text to find
  * the phrase.
+ * 
+ * @author Nicklas Rosvall Carlquist
  */
 public interface Provider {
 	
@@ -21,6 +23,8 @@ public interface Provider {
 	 * Check if the key phrase has been provided.
 	 *
 	 * @return true, if successful
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	default boolean check()
 	{
@@ -37,6 +41,8 @@ public interface Provider {
 	 *
 	 * @param arguments a HashMap<String, String> with arguments for the Parser
 	 * @return the parser
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	default Parser getParser(HashMap<String, String> arguments)
 	{
@@ -82,6 +88,8 @@ public interface Provider {
 	 * <p>Returns the current date</p>
 	 *
 	 * @return Current date in yyyy-MM-dd HH:mm format
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	default String getDate()
 	{
@@ -94,6 +102,8 @@ public interface Provider {
 	 * <p>Prints text to <code>System.out</code> with a prefix date in brackets.</p>
 	 *
 	 * @param text text to be printed
+	 * 
+	 * @author Nicklas Rosvall Carlquist
 	 */
 	default void print(String text)
 	{
