@@ -90,6 +90,8 @@ public class GUMProvider implements Provider {
 		this.lastEmailAddress = "";
 		this.parser = this.getParser(arguments);
 		
+		this.printUsage();
+		
 		if(Boolean.valueOf(arguments.get("notify")))
 		{
 			System.out.println(String.format(NOTIFY_INFO, arguments.get("keyphrase")));
@@ -469,6 +471,44 @@ public class GUMProvider implements Provider {
 		
 		return ipAddress;
 		
+	}
+	
+	/* (non-Javadoc)
+	 * @see se.cqst.sleeper.providers.Provider#printHelp()
+	 * 
+	 * Override the default printHelp implementation and print
+	 * specific help for GUMProvider.
+	 * 
+	 * Call the Parsers printHelp() function too.
+	 */
+	@Override
+	public void printHelp()
+	{
+		print("Provider GUMProvider listens to a GuerrillaMail e-mail address that is re-generated every day. The current address"
+				+ "can be generated from another instance by using the argument \"notify\" with the same keyphrase (case sensitive!)");
+		
+		if(this.parser != null)
+			parser.printHelp();
+	}
+	
+	/* (non-Javadoc)
+	 * @see se.cqst.sleeper.providers.Provider#printUsage()
+	 * 
+	 * Override printUsage() and display information about
+	 * the current configuration of GUMProvider.
+	 * 
+	 * Also call the function printUsage() on this.parser
+	 */
+	@Override
+	public void printUsage()
+	{
+		print("GUMProvider will be used and will listen to a generated e-mail address for the incoming keyprase.");
+		if(Boolean.valueOf(this.arguments.get("notify")))
+			print("Argument notify has been set and GUMProvider will only display the current valid e-mail address for the"
+					+ "given keyphrase (note that the keyphrase is case sensitive)");
+		
+		if(this.parser != null)
+			parser.printUsage();
 	}
 	
 	/**
