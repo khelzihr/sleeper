@@ -36,10 +36,10 @@ public interface Provider {
 	 * provided.</p>
 	 * 
 	 * <p>The full name of the class must be provided in the key "parser", ex:
-	 * <br />
+	 * <br>
 	 * <code>arguments.set("parser", "se.cqst.sleeper.parsers.PlainTextParser");</code></p>
 	 *
-	 * @param arguments a HashMap<String, String> with arguments for the Parser
+	 * @param arguments a HashMap&lt;String, String&gt; with arguments for the Parser
 	 * @return the parser
 	 * 
 	 * @author Nicklas Rosvall Carlquist
@@ -113,7 +113,7 @@ public interface Provider {
 	/**
 	 * <p>Print detailed information about how you configure and use the Provider</p>
 	 * 
-	 * <p>Example: <i>Provider x performs task y to see if the key phrase exist.<br />
+	 * <p>Example: <i>Provider x performs task y to see if the key phrase exist.<br>
 	 * The following is a list of valid arguments: argument A, argument B, argument C -etc</i></p>
 	 * 
 	 * @author Nicklas Rosvall Carlquist

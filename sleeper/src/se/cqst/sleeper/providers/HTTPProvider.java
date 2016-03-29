@@ -38,7 +38,7 @@ import se.cqst.sleeper.parsers.Parser;
  * 			<tr><th>Key</th><th>Accepted value</th><th>Comment</th></tr>
  * 		</thead>
  * 		<tbody>
- * 			<tr><td>keyphrase</td><td>String</td><td>check() returns true if found</td</tr>
+ * 			<tr><td>keyphrase</td><td>String</td><td>check() returns true if found</td></tr>
  * 			<tr><td>debug</td><td>boolean</td><td>Prints info interesting while debugging</td></tr>
  * 			<tr><td>parser</td><td>Class</td><td>Full class name of a Parser to process messages</td></tr>
  * 		</tbody>
@@ -111,7 +111,6 @@ public class HTTPProvider implements Provider {
 	 * <p>Only <code>HTTP 200 OK</code> status code is accepted; pages using e.g. <code> HTTP 3xx codes (
 	 * 301 Moved Permanently, 302 Moved)</code> will not be parsed.</p>
 	 * 
-	 * @param url URL to the web page that should be polled for the key phrase
 	 * @return true, if the <code>Parser</code> object finds the key phrase on the page
 	 * 
 	 * @author Nicklas Rosvall Carlquist

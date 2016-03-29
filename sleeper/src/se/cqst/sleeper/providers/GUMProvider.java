@@ -27,7 +27,7 @@ import se.cqst.sleeper.parsers.Parser;
  * listen to it for the key phrase.</p>
  * 
  * <p>A new e-mail address will be generated every day, and users can remotley fetch the new address
- * by running the application with the following arguments: <br /></p>
+ * by running the application with the following arguments: <br></p>
  * <p><code>provider=se.cqst.sleeper.providers.GUMProvider keyphrase=[phrase] <b>notify</b></code></p>
  * 	 
  * <p>The following keys are used by GUMProvider (all keys are in the format (String, String)
@@ -43,7 +43,7 @@ import se.cqst.sleeper.parsers.Parser;
  * 		</thead>
  * 		<tbody>
  * 			<tr><td>notify</td><td>boolean</td><td>Display current e-mail address and halt</td></tr>
- * 			<tr><td>keyphrase</td><td>String</td><td>check() returns true if found</td</tr>
+ * 			<tr><td>keyphrase</td><td>String</td><td>check() returns true if found</td></tr>
  * 			<tr><td>verbose</td><td>boolean</td><td>Prints more information if set to true</td></tr>
  * 			<tr><td>debug</td><td>boolean</td><td>Prints info interesting while debugging</td></tr>
  * 			<tr><td>parser</td><td>Class</td><td>Full class name of a Parser to process messages</td></tr>
@@ -405,7 +405,7 @@ public class GUMProvider implements Provider {
 	 * 
 	 * <p>The MD5 hash consists of:
 	 * <code><ul><li>A salt</li><li>The key phase</li><li>Todays date (yyyyMMdd)</li>
-	 * </ul></li></code></p>
+	 * </ul></code></p>
 	 *
 	 * @return A MD5 hashed String
 	 * 

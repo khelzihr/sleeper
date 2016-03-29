@@ -43,9 +43,9 @@ public interface Parser {
 	 * For key phrase <code>Foo</code>, ParserX.phraseExists() would return <code>true</code> if <code>ooF</code>
 	 * exists in the input data.</i></p>
 	 * 
-	 * <p><i>Valid arguments are: argumentA, argumentB, argumentC<br />
-	 * argumentA - do something<br />
-	 * argumentB - do something else<br />
+	 * <p><i>Valid arguments are: argumentA, argumentB, argumentC<br>
+	 * argumentA - do something<br>
+	 * argumentB - do something else<br>
 	 * argumentC - do something different</i></p>
 	 * 
 	 * @author Nicklas Rosvall Carlquist

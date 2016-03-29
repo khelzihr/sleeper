@@ -22,7 +22,7 @@ import java.util.HashMap;
  * 			<tr><th>Key</th><th>Accepted value</th><th>Comment</th></tr>
  * 		</thead>
  * 		<tbody>
- * 			<tr><td>ptp_ci</td><td>boolean</td><td>if set, compares input and key phrase case insensitive</td</tr>
+ * 			<tr><td>ptp_ci</td><td>boolean</td><td>if set, compares input and key phrase case insensitive</td></tr>
  * 		</tbody>
  * 	</table>
  * </code>
