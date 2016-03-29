@@ -67,6 +67,7 @@ public class GUMProvider implements Provider {
 	
 	private HashMap<String, String>	arguments;
 	private String lastEmailAddress;
+	private Parser parser;
 	
 	private ObjectMapper mapper;
 	
@@ -83,6 +84,7 @@ public class GUMProvider implements Provider {
 		this.arguments = arguments;
 		this.mapper = new ObjectMapper();
 		this.lastEmailAddress = "";
+		this.parser = this.getParser(arguments);
 		
 		if(Boolean.valueOf(arguments.get("notify")))
 		{
@@ -125,7 +127,6 @@ public class GUMProvider implements Provider {
 	 */
 	private boolean parseEmails(GuerrillaMailboxObject object)
 	{
-		Parser parser = this.getParser(arguments);
 		if(object == null || object.getList() == null || object.getList().isEmpty())
 			return false;
 		else
@@ -145,7 +146,7 @@ public class GUMProvider implements Provider {
 				{
 					if(Boolean.valueOf(arguments.get("debug")))
 						print("Debug: Parsing mail: " + mail.getMail_id());
-					if(parser.phraseExists(arguments.get("keyphrase"), mail.getMail_body()))
+					if(this.parser.phraseExists(arguments.get("keyphrase"), mail.getMail_body()))
 						return true;
 				}
 			}
