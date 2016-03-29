@@ -58,6 +58,7 @@ public class HTTPProvider implements Provider {
 	
 	private HashMap<String, String> arguments;
 	private Parser parser;
+	private URL address;
 	
 	/**
 	 * <p>Instantiate a new <code>HTTPProvider</code> using the provided <code>HashMap&lt;String, String&gt;</code>
@@ -73,31 +74,33 @@ public class HTTPProvider implements Provider {
 	{
 		this.arguments = arguments;
 		this.parser = this.getParser(arguments);
+		
+		this.address = null;
+		try
+		{
+			this.address = new URL(arguments.get("httpaddress"));
+		}
+		catch(MalformedURLException ex)
+		{
+			print("The specified URL \"" + arguments.get("httpaddress") + "\" is not a valid URL. "
+					+ "Remember to include protocol (http:// or https://) in the address.");
+			ex.printStackTrace();
+			System.exit(-1);
+		}
+		
+		this.printUsage();
 	}
 	
 	/* (non-Javadoc)
 	 * @see se.cqst.sleeper.providers.Provider#check()
 	 * 
-	 * The check() method in HTTPProvider calls parseURL(URL url) to determine
+	 * The check() method in HTTPProvider calls parseURL() to determine
 	 * if the key phrase exists on the provided web page.
 	 */
 	@Override
 	public boolean check()
 	{
-		URL address = null;
-		try
-		{
-			address = new URL(arguments.get("httpaddress"));
-		}
-		catch(MalformedURLException ex)
-		{
-			print("The specified URL \"" + arguments.get("httpaddress") + "\" is not a valid URL");
-			ex.printStackTrace();
-			System.exit(0);
-		}
-		
-		
-		return parseURL(address);
+		return parseURL();
 	}
 	
 	/**
@@ -117,17 +120,17 @@ public class HTTPProvider implements Provider {
 	 * for information about HTTP Status Codes
 	 * 
 	 */
-	private boolean parseURL(URL url)
+	private boolean parseURL()
 	{
 		String data = "";
 		try
 		{
-			HttpsURLConnection connection = (HttpsURLConnection)url.openConnection();
+			HttpsURLConnection connection = (HttpsURLConnection)this.address.openConnection();
 			connection.addRequestProperty("User-Agent", USER_AGENT);	
 			
 			if(connection.getResponseCode() != 200)
 			{
-				print(connection.getResponseCode() + connection.getResponseMessage() + " when trying to access " + url.toString());
+				print(connection.getResponseCode() + connection.getResponseMessage() + " when trying to access " + this.address.toString());
 			}
 			else
 			{
@@ -143,10 +146,46 @@ public class HTTPProvider implements Provider {
 		catch (IOException e)
 		{
 			e.printStackTrace();
-			System.exit(0);
+			System.exit(-1);
 		}
 		
 		return this.parser.phraseExists(arguments.get("keyphrase"), data);
+	}
+	
+	/* (non-Javadoc)
+	 * @see se.cqst.sleeper.providers.Provider#printHelp()
+	 * 
+	 * Override default printHelp() and display help about HTTPProvider.
+	 * 
+	 * Also run this.parser.printHelp()
+	 */
+	@Override
+	public void printHelp()
+	{
+		print("Provider HTTPProvider fetches a specified web page and uses a Parser to search within for"
+				+ "the keyphrase. The web page is specified using argument httpaddress, e.g. httpaddress=http://www.example.com."
+				+ "HTTPParser supports both HTTP and HTTPS, but cannot follow redirects and will not parse HTTP status pages (such"
+				+ "as 404 Not Found or 302 Moved)");
+		
+		if(this.parser != null)
+			this.parser.printHelp();
+	}
+	
+	/* (non-Javadoc)
+	 * @see se.cqst.sleeper.providers.Provider#printUsage()
+	 * 
+	 * Override default printUsage() and display usage info about HTTPProvider
+	 * 
+	 * Also run this.parser.printUsage()
+	 */
+	@Override
+	public void printUsage()
+	{
+		print("HTTPProvider will be used to check the specified web page for the keyphrase.");
+		print("The specified address is : " + arguments.get("httpaddress"));
+		
+		if(this.parser != null)
+			this.parser.printUsage();
 	}
 
 }
