@@ -38,12 +38,12 @@ public interface Parser {
 	
 	default void	printHelp()
 	{
-		print("This Provider has no help specified.");
+		print("This Parser has no help specified.");
 	}
 	
 	default void	printUsage()
 	{
-		print("This provider has no usage information defined.");
+		print("This Parser has no usage information defined.");
 	}
 
 }
