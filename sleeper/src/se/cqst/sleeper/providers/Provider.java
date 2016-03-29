@@ -110,11 +110,28 @@ public interface Provider {
 		System.out.println("[" + getDate() + "] " + text);
 	}
 	
+	/**
+	 * <p>Print detailed information about how you configure and use the Provider</p>
+	 * 
+	 * <p>Example: <i>Provider x performs task y to see if the key phrase exist.<br />
+	 * The following is a list of valid arguments: argument A, argument B, argument C -etc</i></p>
+	 * 
+	 * @author Nicklas Rosvall Carlquist
+	 */
 	default void	printHelp()
 	{
 		print("This Provider has no help specified.");
 	}
 	
+	/**
+	 * <p>Print information about what the Provider will do. This information will be
+	 * displayed when you run the application with the specified Provider</p>
+	 * 
+	 * <p>Example: <i>Provider x will perform task y to see if the key phrase
+	 * exist.</i></p>
+	 * 
+	 * @author Nicklas Rosvall Carlquist
+	 */
 	default void	printUsage()
 	{
 		print("This provider has no usage information defined.");
