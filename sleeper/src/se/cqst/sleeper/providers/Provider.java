@@ -109,5 +109,15 @@ public interface Provider {
 	{
 		System.out.println("[" + getDate() + "] " + text);
 	}
+	
+	default void	printHelp()
+	{
+		print("This Provider has no help specified.");
+	}
+	
+	default void	printUsage()
+	{
+		print("This provider has no usage information defined.");
+	}
 
 }
