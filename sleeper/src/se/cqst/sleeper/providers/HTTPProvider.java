@@ -1,10 +1,13 @@
 package se.cqst.sleeper.providers;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -59,6 +62,7 @@ public class HTTPProvider implements Provider {
 	private HashMap<String, String> arguments;
 	private Parser parser;
 	private URL address;
+	private boolean ssl = false;
 	
 	/**
 	 * <p>Instantiate a new <code>HTTPProvider</code> using the provided <code>HashMap&lt;String, String&gt;</code>
@@ -87,6 +91,11 @@ public class HTTPProvider implements Provider {
 			ex.printStackTrace();
 			System.exit(-1);
 		}
+		
+		Pattern sslPattern = Pattern.compile("(https)(\\:\\/\\/)(.*)($)");
+		Matcher sslMatcher = sslPattern.matcher(address.toString());
+		if(sslMatcher.matches())
+			this.ssl = true;
 		
 		this.printUsage();
 	}
@@ -124,7 +133,11 @@ public class HTTPProvider implements Provider {
 		String data = "";
 		try
 		{
-			HttpsURLConnection connection = (HttpsURLConnection)this.address.openConnection();
+			HttpURLConnection connection = null;
+			if(this.ssl)
+				connection = (HttpsURLConnection)this.address.openConnection();
+			else
+				connection = (HttpURLConnection)this.address.openConnection();
 			connection.addRequestProperty("User-Agent", USER_AGENT);	
 			
 			if(connection.getResponseCode() != 200)
