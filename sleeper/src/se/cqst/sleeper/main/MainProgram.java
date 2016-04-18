@@ -6,49 +6,88 @@ import java.util.HashMap;
 import se.cqst.sleeper.SleeperTask;
 import se.cqst.sleeper.providers.*;
 
+/**
+ * The MainProgram class parses arguments and launches a SleeperTask.
+ * 
+ * @author Nicklas Rosvall Carlquist
+ *
+ */
 public class MainProgram {
 
+	/**
+	 * Parse incoming arguments and create a SleeperTask
+	 * @param args Input arguments
+	 */
 	public static void main(String[] args) 
 	{
+		//	Create arguments HashMap by passing args to getArguments()
 		HashMap<String, String>	arguments = MainProgram.getArguments(args);
+		
+		//	Create empty HashMap to use for comparison
 		HashMap<String, String> emptyArgs = new HashMap<String, String>();
+		
+		//	Initialize emptyArgs to default values
 		MainProgram.initialize(emptyArgs);
+		
+		//	If arguments are empty, print usage information and exit application
 		if(arguments.equals(emptyArgs))
 		{
 			MainProgram.printHelp();
 			System.exit(0);
 		}
+		
+		//	Dynamically create ProviderImpl object
 		Provider provider = MainProgram.getProvider(arguments);
 		
+		//Print all arguments if debug is set
 		if(Boolean.valueOf(arguments.get("debug")))
 			System.out.println(arguments.toString());
 		
 		SleeperTask sleeperTask = SleeperTask.getInstance();
 		
+		//	Set default repeat interval to 5 minutes
 		int repeat = 5;
+		
+		//	Try to get custom repeat interval
 		try
 		{
 			repeat = Integer.parseInt(arguments.get("repeat"));
 		}
 		catch(NumberFormatException ex)
 		{ }
+		
+		//	Set SleeperTask verbose status based on arguments
 		sleeperTask.setVerbose(Boolean.valueOf(arguments.get("verbose")));
 		
+		//	Set SleeperTask repeat to repeat
 		sleeperTask.setRepeat(repeat);
+		
+		//	Set SleeperTask provider
 		sleeperTask.setProvider(provider);
+		
+		//	Set SleeperTask action
 		sleeperTask.setAction(arguments.get("action"));
 
+		//	Start SleeperTask
 		sleeperTask.run();
 		
 		
 	}
 	
+	/**
+	 * Print help. 
+	 * 
+	 */
 	public static void printHelp()
 	{
-		//TODO: Rewrite help
 		System.out.println("Sleeper - TODO: Write help section");
 	}
 	
+	/**
+	 * Extract arguments from a String array
+	 * @param args Input String array
+	 * @return HashMap&lt;String, String&gt; with arguments
+	 */
 	private static HashMap<String, String> getArguments(String[] args)
 	{
 		HashMap<String, String>	arguments = new HashMap<String, String>();
@@ -64,6 +103,14 @@ public class MainProgram {
 		return arguments;
 	}
 	
+	/**
+	 * Try to instantiate a {@link Provider} from a HashMap of arguments.
+	 * 
+	 * The argument value of key "provider" must be a FQDN of the Provider implementation.
+	 * 
+	 * @param arguments HashMap of arguments
+	 * @return Provider
+	 */
 	private static Provider getProvider(HashMap<String, String> arguments)
 	{
 		Provider provider = null;
@@ -104,6 +151,10 @@ public class MainProgram {
 		return provider;
 	}
 	
+	/**
+	 * Add (or set if already exists) default values for keys in a HashMap of arguments
+	 * @param arguments Input arguments HashMap
+	 */
 	private static void initialize(HashMap<String, String> arguments)
 	{
 		arguments.put("keyphrase", "");
