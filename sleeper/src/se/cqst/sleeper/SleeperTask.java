@@ -9,6 +9,15 @@ import java.util.TimerTask;
 
 import se.cqst.sleeper.providers.Provider;
 
+/**
+ * <p>The <strong>SleeperTask</strong> class uses a {@link Provider} to check if a <i>key phrase</i> has been detected.
+ * Upon detection, the specified task will execute and the <code>SleeperTask</code> will terminate.</p>
+ * 
+ * <p>The <code>SleeperTask</code> implements the <code>Singleton</code> pattern to simplify call-backs to the parent class</p>
+ * 
+ * @author Nicklas Rosvall Carlquist
+ *
+ */
 public class SleeperTask  {
 	
 	public static final String	TASK_EXECUTE = "Keyphrase found, executing action...";
@@ -28,7 +37,9 @@ public class SleeperTask  {
 	
 	private boolean verbose;
 
-	
+	/**
+	 * Create a new SleeperTask object
+	 */
 	private SleeperTask()
 	{
 		timer = new Timer();
@@ -38,6 +49,11 @@ public class SleeperTask  {
 		setRepeat(5);
 	}
 	
+	/**
+	 * Returns the single SleeperTask instance.
+	 * If the instance does not exist, create it.
+	 * @return
+	 */
 	public static SleeperTask getInstance()
 	{
 		if(instance == null)
@@ -86,6 +102,12 @@ public class SleeperTask  {
 			print("Repeat set to: " + repeat + " min (min value allowed is 3 min)");
 	}
 	
+	/**
+	 * <p>Returns an instantiation of the TimerTask that will poll a {@link Provider} object. 
+	 * If the <code>Provider</code> object returns true, execute the action specified by the provided
+	 * arguments.</p>
+	 * @return
+	 */
 	private TimerTask getTimerTask()
 	{
 		TimerTask task = new TimerTask()
@@ -140,6 +162,10 @@ public class SleeperTask  {
 		return task;
 	}
 	
+	/**
+	 * <p>Returns the current date and time in the yyyy-MM-dd HH:mm format</p>
+	 * @return
+	 */
 	private String getDate()
 	{
 		Calendar cal = Calendar.getInstance();
@@ -147,11 +173,19 @@ public class SleeperTask  {
 		return sdf.format(cal.getTime());
 	}
 	
+	/**
+	 * <p>Prints to the System.out but with added prefix of {@link #getDate()}</p>
+	 * @param text
+	 */
 	public void print(String text)
 	{
 		System.out.println("[" + getDate() + "] " + text);
 	}
 	
+	/**
+	 * <p>Executes the SleeperTask, scheduling the TimerTask object to execute at the interval specified
+	 * by SleeperTask.repeat</p>
+	 */
 	public void run()
 	{
 		timer.scheduleAtFixedRate(this.getTimerTask(), 0, repeat * 60 * 1000);
